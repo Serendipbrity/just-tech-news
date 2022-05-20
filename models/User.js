@@ -1,6 +1,8 @@
 // import model and data types from sequelize
 const { Model, DataTypes, INTEGER } = require('sequelize');
 const sequelize = require('../config/connection');
+// for encrypting passwords
+const bcrypt = require('bcrypt');
 
 // create our User model, use extends keyword so User inherits all functionality of Model class
 class User extends Model {}
@@ -19,6 +21,7 @@ User.init(
             //instruct that this is the Primary Key
             primaryKey: true,
             autoIncrement: true
+            // defaultValue: true
         },
         // define a username column
         username: {
@@ -29,6 +32,7 @@ User.init(
         email: {
             type: DataTypes.STRING,
             allowNull: false,
+            unique: true,
             // there cannot be any duplicate email values in this table
             validate: {
                 isEmail: true
@@ -44,8 +48,19 @@ User.init(
             }
         }
     },
-    // the second object configs certain options for the table
     {
+        hooks: {
+    //set up beforeCreate lifecycle "hook" functonality
+            async beforeCreate(newUserData) {
+                newUserData.password = await bcrypt.hash(newUserData.password, 10);
+                return newUserData;
+            },
+           // set up beforeUpdate lifecycle "hook" functionality
+            async beforeUpdate(updatedUserData) {
+                updatedUserData.password = await bcrypt.hash(updatedUserData.password, 10);
+                return updatedUserData;
+            }
+        },
         // pass in our imported sequelize connection (the direct connection to our database) sequelize
         sequelize,
         // dont automatically create createdAt/updatedAt timestamp fields
