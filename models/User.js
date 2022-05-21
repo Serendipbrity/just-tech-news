@@ -1,11 +1,16 @@
 // import model and data types from sequelize
-const { Model, DataTypes, INTEGER } = require('sequelize');
+const { Model, DataTypes } = require('sequelize');
 const sequelize = require('../config/connection');
 // for encrypting passwords
 const bcrypt = require('bcrypt');
 
 // create our User model, use extends keyword so User inherits all functionality of Model class
-class User extends Model {}
+class User extends Model {
+    //set up method to run on instance data (per user) to check password
+    checkPassword(loginPw) {
+        return bcrypt.compareSync(loginPw, this.password);
+    }
+}
 
 // define table columns and configuration
 // use init() method to initialize the models data and configuration passing in two objects
@@ -20,8 +25,8 @@ User.init(
             allowNull: false,
             //instruct that this is the Primary Key
             primaryKey: true,
-            autoIncrement: true
-            // defaultValue: true
+            autoIncrement: true,
+            defaultValue: true
         },
         // define a username column
         username: {
