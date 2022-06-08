@@ -26,7 +26,7 @@ User.init(
             //instruct that this is the Primary Key
             primaryKey: true,
             autoIncrement: true,
-            defaultValue: true
+             defaultValue: true
         },
         // define a username column
         username: {
